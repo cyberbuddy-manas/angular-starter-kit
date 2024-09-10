@@ -1,0 +1,20 @@
+<div
+  class="p-0.5"
+  [ngClass]="{
+    'size-8 text-xs': size === 'small',
+    'size-16 text-xl': size === 'medium',
+    'size-20 text-2xl': size === 'large'
+  }"
+>
+  <div
+    class="flex rounded-full justify-center items-center size-full"
+    [style.background-color]="value"
+  >
+    @if(checked) {
+    <div
+      class="size-1/2 rounded-full"
+      [style.background-color]="colorContrast"
+    ></div>
+    }
+  </div>
+</div>

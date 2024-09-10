@@ -1,0 +1,23 @@
+<div class="container mx-auto p-5">
+  <form [formGroup]="form">
+    <mat-form-field class="my-4 w-full">
+      <mat-label>Search term</mat-label>
+      <input matInput formControlName="search" type="search" />
+      <mat-hint><em>Dummy element for testing tab navigation</em></mat-hint>
+    </mat-form-field>
+
+    <brew-color-grid-select formControlName="color" [itemSize]="'medium'" />
+
+    <div class="flex justify-end pt-5">
+      <button mat-raised-button type="submit">Submit</button>
+    </div>
+  </form>
+
+  <hr class="my-5" />
+
+  <div class="py-2">
+    <code class="block whitespace-pre overflow-x-scroll">{{
+      form.value | json
+    }}</code>
+  </div>
+</div>

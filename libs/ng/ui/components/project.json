@@ -1,0 +1,75 @@
+{
+  "name": "ng-ui-components",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ng/ui/components/src",
+  "prefix": "statusbrew",
+  "tags": ["scope:ng", "type:ui"],
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/ng/ui/components/ng-package.json",
+        "tailwindConfig": "libs/ng/ui/components/tailwind.config.js"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ng/ui/components/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/ng/ui/components/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "libs/ng/ui/components/.storybook",
+        "browserTarget": "ng-ui-components:build-storybook",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "styles": ["libs/ng/ui/components/.storybook/styles/main.scss"],
+        "outputDir": "dist/storybook/ng-ui-components",
+        "configDir": "libs/ng/ui/components/.storybook",
+        "browserTarget": "ng-ui-components:build-storybook",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "test-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test-storybook -c libs/ng/ui/components/.storybook --url=http://localhost:4400"
+      }
+    },
+    "static-storybook": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "ng-ui-components:build-storybook",
+        "staticFilePath": "dist/storybook/ng-ui-components"
+      },
+      "configurations": {
+        "ci": {
+          "buildTarget": "ng-ui-components:build-storybook:ci"
+        }
+      }
+    }
+  }
+}

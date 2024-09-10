@@ -1,0 +1,13 @@
+{
+  // https://github.com/tailwindlabs/tailwindcss/discussions/5258#discussioncomment-1979394
+  "css.customData": [".vscode/tailwind.json"],
+
+  "files.associations": {
+    // https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss#recommended-vs-code-settings
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    // https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss#recommended-vs-code-settings
+    "strings": "on"
+  }
+}

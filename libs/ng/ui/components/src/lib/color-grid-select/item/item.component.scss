@@ -1,0 +1,15 @@
+:host {
+  @apply rounded-full;
+  &:not([disabled]) {
+    @apply cursor-pointer;
+  }
+  &:focus,
+  &.active {
+    @apply bg-blue-400 bg-opacity-80 outline-none;
+  }
+}
+
+// .mdc-checkbox__native-control,
+// .mdc-radio__native-control {
+//   display: none;
+// }
