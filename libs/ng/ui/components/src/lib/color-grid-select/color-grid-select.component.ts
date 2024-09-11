@@ -69,8 +69,7 @@ import { Subject, takeUntil } from 'rxjs';
   ],
 })
 export class ColorGridSelectComponent
-  implements ControlValueAccessor, ColorGridSelect, AfterViewInit, OnDestroy
-{
+  implements ControlValueAccessor, ColorGridSelect, AfterViewInit, OnDestroy {
   private readonly _ngZone = inject(NgZone);
   private readonly _el = inject(ElementRef<ColorGridSelectComponent>);
 
@@ -243,31 +242,50 @@ export class ColorGridSelectComponent
    */
   @HostListener('keydown', ['$event'])
   private _onKeydown(event: KeyboardEvent) {
-    // switch (event.keyCode) {
-    //   case UP_ARROW:
-    //     // add logic
-    //     break;
-    //   case DOWN_ARROW:
-    //     // add logic
-    //     break;
-    //   case LEFT_ARROW:
-    //     // add logic
-    //     break;
-    //   case RIGHT_ARROW: {
-    //     // add logic
-    //     break;
-    //   }
-    // }
+    const activeIndex = this._keyManager.activeItemIndex;
 
-    // @fixme remove the following code block after
-    // the above navigation logic is completed
-    // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    if (
-      includes([UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW], event.keyCode)
-    ) {
-      this._keyManager.onKeydown(event);
+    // Ensure we always have an active item
+    if (activeIndex === null || this._keyManager.activeItem === null) {
+      // Set the first item as active if none is active
+      this._keyManager.setActiveItem(0);
     }
-    // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+    const currentIndex = this._colorGridItemsQl.toArray().indexOf(this._keyManager.activeItem!); // ActiveItem will not be null now
+    const columns = this._itemsPerRow();
+
+    switch (event.keyCode) {
+      case UP_ARROW: {
+        const newIndexUp = currentIndex - columns;
+        if (newIndexUp >= 0) {
+          this._keyManager.setActiveItem(newIndexUp);
+          this.emitChange(this._items()[newIndexUp]);
+        }
+        break;
+      }
+      case DOWN_ARROW: {
+        const newIndexDown = currentIndex + columns;
+        if (newIndexDown < this._items().length) {
+          this._keyManager.setActiveItem(newIndexDown);
+          this.emitChange(this._items()[newIndexDown]);
+        }
+        break;
+      }
+      case LEFT_ARROW:
+      case RIGHT_ARROW: {
+        this._keyManager.onKeydown(event); // Existing horizontal navigation logic
+        break;
+      }
+    }
+
+    // // @fixme remove the following code block after
+    // // the above navigation logic is completed
+    // // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // if (
+    //   includes([UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW], event.keyCode)
+    // ) {
+    //   this._keyManager.onKeydown(event);
+    // }
+    // // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
   }
 
   /** Handles focusout events within the list. */
