@@ -5,6 +5,8 @@
     'size-16 text-xl': size === 'medium',
     'size-20 text-2xl': size === 'large'
   }"
+  [attr.data-testid]="'color-item-' + value"
+  [attr.aria-checked]="checked ? 'true' : 'false'"
 >
   <div
     class="flex rounded-full justify-center items-center size-full"
