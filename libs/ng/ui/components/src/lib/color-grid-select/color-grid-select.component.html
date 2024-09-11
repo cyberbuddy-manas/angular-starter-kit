@@ -1,12 +1,21 @@
-@for(row of grid(); track $index) {
-<div class="flex">
-  @for (item of row; track item) {
-  <brew-color-grid-item
-    [checked]="value === item"
-    [value]="item"
-    [size]="itemSize"
-    [disabled]="disabled"
-  />
+<div role="radiogroup" aria-label="Color selection grid">
+  @for(row of grid(); track $index) {
+    <div class="flex" role="row">
+      @for (item of row; track item) {
+        <brew-color-grid-item
+          [checked]="value === item"
+          [value]="item"
+          [size]="itemSize"
+          [disabled]="disabled"
+          [attr.role]="'radio'" 
+          [attr.aria-checked]="value === item ? 'true' : 'false'"
+          [attr.aria-disabled]="disabled ? 'true' : null"
+          [attr.tabindex]="value === item ? 0 : -1"
+          (click)="selectColor(item)"
+        >
+          <span class="sr-only">Color {{ item }}</span> <!-- Visually hidden label -->
+        </brew-color-grid-item>
+      }
+    </div>
   }
 </div>
-}

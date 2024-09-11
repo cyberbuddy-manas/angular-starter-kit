@@ -180,6 +180,18 @@ export class ColorGridSelectComponent
     }
   }
 
+  /** 
+   * Select a color and update the component's state 
+   * 
+   * Handles the selection of a color, sets the value, and emits the change event.
+   */
+  selectColor(color: string) {
+    if (!this.disabled) {
+      this.value = color;
+      this.emitChange(color);
+    }
+  }
+
   /** Implemented as part of {@link ColorGridSelect} interface */
   public emitChange(value?: string | null | undefined) {
     this.markAsTouched();
@@ -246,7 +258,6 @@ export class ColorGridSelectComponent
 
     // Ensure we always have an active item
     if (activeIndex === null || this._keyManager.activeItem === null) {
-      // Set the first item as active if none is active
       this._keyManager.setActiveItem(0);
     }
 
@@ -272,7 +283,7 @@ export class ColorGridSelectComponent
       }
       case LEFT_ARROW:
       case RIGHT_ARROW: {
-        this._keyManager.onKeydown(event); // Existing horizontal navigation logic
+        this._keyManager.onKeydown(event);
         break;
       }
     }
