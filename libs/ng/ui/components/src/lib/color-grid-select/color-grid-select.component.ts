@@ -161,14 +161,14 @@ export class ColorGridSelectComponent
 
   /** The computed 2d grid of items */
   public readonly grid = computed((): string[][] => {
-    const itemsPerRow = this._itemsPerRow();  // How many items per row
-    const items = this._items();              // The list of color items
+    const itemsPerRow = this._itemsPerRow();
+    const items = this._items();
 
-    console.log('Items:', items);             // Log items
-    console.log('Items per Row:', itemsPerRow); // Log number of items per row
+    console.log('Items:', items);
+    console.log('Items per Row:', itemsPerRow);
 
-    const chunkedItems = chunk(items, itemsPerRow);  // Chunking the array
-    console.log('Chunked grid:', chunkedItems);      // Log chunked grid for debugging
+    const chunkedItems = chunk(items, itemsPerRow);
+    console.log('Chunked grid:', chunkedItems);
 
     return chunkedItems;
   });
@@ -177,16 +177,8 @@ export class ColorGridSelectComponent
   private _calculateItemsPerRow(): void {
     const containerWidth = this._elContainer.nativeElement.offsetWidth;
 
-    // Set fixed item width (adjust based on your preferences)
-    const itemWidth = 80; // You can change this value as needed
-
-    // Dynamically calculate items per row based on the container's width
+    const itemWidth = 80;
     const itemsPerRow = Math.max(Math.floor(containerWidth / itemWidth))
-
-    console.log('Container Width:', containerWidth);
-    console.log('Updated items per row:', itemsPerRow);
-
-    // Ensure we have at least 1 item per row
     this._itemsPerRow.set(itemsPerRow);
   }
 
@@ -324,25 +316,18 @@ export class ColorGridSelectComponent
     window.removeEventListener('resize', this._calculateItemsPerRow.bind(this));
   }
 
-  // Resize event handler
   private _onResize() {
     this._setItemsPerRow();
   }
 
-  // Dynamically calculate the number of items per row based on the container width
   private _setItemsPerRow() {
     const containerWidth = this._el.nativeElement.offsetWidth;
-
-    // For example, each item is 100px wide with 10px margin (adjust this value based on your item size)
     const itemWidth = 70;
 
-    // Calculate how many items fit in one row
     const itemsPerRow = Math.floor(containerWidth / itemWidth);
-
-    // Set items per row
     this._itemsPerRow.set(itemsPerRow);
 
-    console.log('Items per Row:', itemsPerRow); // Debugging
+    // console.log('Items per Row:', itemsPerRow);
   }
 
   /**
@@ -354,7 +339,6 @@ export class ColorGridSelectComponent
   private _onKeydown(event: KeyboardEvent) {
     const activeIndex = this._keyManager.activeItemIndex;
 
-    // Ensure we always have an active item
     if (activeIndex === null || this._keyManager.activeItem === null) {
       this._keyManager.setActiveItem(0);
     }
@@ -372,10 +356,28 @@ export class ColorGridSelectComponent
         break;
       }
       case DOWN_ARROW: {
-        const newIndexDown = currentIndex + columns;
-        if (newIndexDown < this._items().length) {
-          this._keyManager.setActiveItem(newIndexDown);
-          this.emitChange(this._items()[newIndexDown]);
+        const currentRowIndex = Math.floor(currentIndex / columns);
+        const nextRowStartIndex = (currentRowIndex + 1) * columns;
+
+        // Check if there's a next row
+        if (nextRowStartIndex < this._items().length) {
+          // Calculate the target index in the next row
+          const targetIndexInNextRow = nextRowStartIndex + (currentIndex % columns);
+
+          // Check if the next row has an item in the same column
+          if (targetIndexInNextRow < this._items().length) {
+            this._keyManager.setActiveItem(targetIndexInNextRow);
+            this.emitChange(this._items()[targetIndexInNextRow]);
+          } else {
+            // If no item in the same column, focus on the last item of the next row
+            const lastItemIndexInNextRow = this._items().length - 1;
+            this._keyManager.setActiveItem(lastItemIndexInNextRow);
+            this.emitChange(this._items()[lastItemIndexInNextRow]);
+          }
+        } else {
+          // If there is no next row, stay on the current item
+          this._keyManager.setActiveItem(currentIndex);
+          this.emitChange(this._items()[currentIndex]);
         }
         break;
       }
