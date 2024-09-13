@@ -13,6 +13,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { chunk } from 'lodash';
+
 import { FocusableOption, Highlightable } from '@angular/cdk/a11y';
 
 export const COLOR_GRID_ITEMS_DEFAULT = [

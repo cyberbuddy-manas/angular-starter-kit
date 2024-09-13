@@ -99,6 +99,14 @@ export class ColorGridSelectComponent
   private _onTouched = (): void => void 0;
   private _onChange = (val?: string | null): void => void 0;
 
+  constructor() {
+    window.addEventListener('resize', this._calculateItemsPerRow.bind(this)); // Bind to window resize
+  }
+
+  trackByItem(index: number, item: string): string {
+    return item;
+  }
+
   @HostBinding('attr.tabindex')
   private get _tabIndex() {
     return -1;
@@ -150,9 +158,36 @@ export class ColorGridSelectComponent
   public readonly valueChange = new EventEmitter<string | null | undefined>();
 
   /** The computed 2d grid of items */
-  public readonly grid = computed((): string[][] =>
-    chunk(this._items(), this._itemsPerRow())
-  );
+  public readonly grid = computed((): string[][] => {
+    const itemsPerRow = this._itemsPerRow();  // How many items per row
+    const items = this._items();              // The list of color items
+
+    console.log('Items:', items);             // Log items
+    console.log('Items per Row:', itemsPerRow); // Log number of items per row
+
+    const chunkedItems = chunk(items, itemsPerRow);  // Chunking the array
+    console.log('Chunked grid:', chunkedItems);      // Log chunked grid for debugging
+
+    return chunkedItems;
+  });
+
+
+  private _calculateItemsPerRow(): void {
+    const containerWidth = this._el.nativeElement.offsetWidth;
+  
+    // Set fixed item width (adjust based on your preferences)
+    const itemWidth = 64; // You can change this value as needed
+  
+    // Dynamically calculate items per row based on the container's width
+    const itemsPerRow = Math.floor(containerWidth / itemWidth);
+  
+    console.log('Container Width:', containerWidth);
+    console.log('Updated items per row:', itemsPerRow);
+  
+    // Ensure we have at least 1 item per row
+    this._itemsPerRow.set(itemsPerRow > 0 ? itemsPerRow : 1);
+  }
+  
 
   // ControlValueAccessor implementation
   public writeValue(val: string): void {
@@ -204,6 +239,19 @@ export class ColorGridSelectComponent
   }
 
   public ngAfterViewInit() {
+    this._itemsPerRow.set(5);
+    this._adjustItemsPerRow();
+    window.addEventListener('resize', this._onResize.bind(this));
+    // this._ngZone.runOutsideAngular(() => {
+      // window.addEventListener('resize', this._adjustItemsPerRow);
+    // });
+
+    // this._calculateItemsPerRow();
+
+    // window.addEventListener('resize', this._calculateItemsPerRow.bind(this));
+
+    // Set initial value of itemsPerRow
+
     this._keyManager = new FocusKeyManager(this._colorGridItemsQl)
       .withHomeAndEnd()
       .withHorizontalOrientation('ltr')
@@ -233,6 +281,34 @@ export class ColorGridSelectComponent
       this._el.nativeElement.addEventListener('focusin', this._handleFocusin);
       this._el.nativeElement.addEventListener('focusout', this._handleFocusout);
     });
+
+    this._keyManager = new FocusKeyManager(this._colorGridItemsQl)
+      .withHomeAndEnd()
+      .withHorizontalOrientation('ltr')
+      .skipPredicate(() => this.disabled)
+      .withWrap();
+  }
+
+  private _adjustItemsPerRow = () => {
+    const containerWidth = this._el.nativeElement.offsetWidth;
+    const itemMargin = 10;  // Adjust based on the actual margin around your items
+    const itemWidth = 80 + 2 * itemMargin;  // Assuming each item takes around 80px + margin
+    let itemsPerRow = Math.floor(containerWidth / itemWidth);
+
+    // Ensure it doesn't go below 1
+    itemsPerRow = Math.max(itemsPerRow, 1);  // Minimum of 1 item
+
+    // Only update if it changes
+    if (itemsPerRow !== this._itemsPerRow()) {
+      this._ngZone.run(() => {
+        this._itemsPerRow.set(itemsPerRow);
+        console.log('Updated items per row:', this._itemsPerRow());
+      });
+    }
+  };
+
+  ngOnInit(): void {
+    this._calculateItemsPerRow();
   }
 
   public ngOnDestroy() {
@@ -245,6 +321,28 @@ export class ColorGridSelectComponent
 
     this._destroyed.next();
     this._destroyed.complete();
+    window.removeEventListener('resize', this._calculateItemsPerRow.bind(this));
+  }
+
+  // Resize event handler
+  private _onResize() {
+    this._setItemsPerRow();
+  }
+
+  // Dynamically calculate the number of items per row based on the container width
+  private _setItemsPerRow() {
+    const containerWidth = this._el.nativeElement.offsetWidth;
+
+    // For example, each item is 100px wide with 10px margin (adjust this value based on your item size)
+    const itemWidth = 110;
+
+    // Calculate how many items fit in one row
+    const itemsPerRow = Math.floor(containerWidth / itemWidth);
+
+    // Set items per row
+    this._itemsPerRow.set(itemsPerRow);
+
+    console.log('Items per Row:', itemsPerRow); // Debugging
   }
 
   /**
