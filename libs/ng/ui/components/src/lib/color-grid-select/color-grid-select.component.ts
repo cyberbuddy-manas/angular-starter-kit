@@ -73,6 +73,8 @@ export class ColorGridSelectComponent
   private readonly _ngZone = inject(NgZone);
   private readonly _el = inject(ElementRef<ColorGridSelectComponent>);
 
+  private readonly _elContainer = inject(ElementRef);
+
   /** Emits when the list has been destroyed. */
   private readonly _destroyed = new Subject<void>();
 
@@ -173,21 +175,21 @@ export class ColorGridSelectComponent
 
 
   private _calculateItemsPerRow(): void {
-    const containerWidth = this._el.nativeElement.offsetWidth;
-  
+    const containerWidth = this._elContainer.nativeElement.offsetWidth;
+
     // Set fixed item width (adjust based on your preferences)
-    const itemWidth = 64; // You can change this value as needed
-  
+    const itemWidth = 80; // You can change this value as needed
+
     // Dynamically calculate items per row based on the container's width
-    const itemsPerRow = Math.floor(containerWidth / itemWidth);
-  
+    const itemsPerRow = Math.max(Math.floor(containerWidth / itemWidth))
+
     console.log('Container Width:', containerWidth);
     console.log('Updated items per row:', itemsPerRow);
-  
+
     // Ensure we have at least 1 item per row
-    this._itemsPerRow.set(itemsPerRow > 0 ? itemsPerRow : 1);
+    this._itemsPerRow.set(itemsPerRow);
   }
-  
+
 
   // ControlValueAccessor implementation
   public writeValue(val: string): void {
@@ -239,12 +241,10 @@ export class ColorGridSelectComponent
   }
 
   public ngAfterViewInit() {
-    this._itemsPerRow.set(5);
+    this._calculateItemsPerRow();
+    // this._itemsPerRow.set(5);
     this._adjustItemsPerRow();
     window.addEventListener('resize', this._onResize.bind(this));
-    // this._ngZone.runOutsideAngular(() => {
-      // window.addEventListener('resize', this._adjustItemsPerRow);
-    // });
 
     // this._calculateItemsPerRow();
 
@@ -334,7 +334,7 @@ export class ColorGridSelectComponent
     const containerWidth = this._el.nativeElement.offsetWidth;
 
     // For example, each item is 100px wide with 10px margin (adjust this value based on your item size)
-    const itemWidth = 110;
+    const itemWidth = 70;
 
     // Calculate how many items fit in one row
     const itemsPerRow = Math.floor(containerWidth / itemWidth);
